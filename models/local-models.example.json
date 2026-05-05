@@ -1,0 +1,7 @@
+{
+  "ollama": {
+    "endpoint": "http://localhost:11434",
+    "modelLocation": "D:/BunnyEramomo/models",
+    "defaultModel": "llama3.1"
+  }
+}

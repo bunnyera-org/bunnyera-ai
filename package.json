@@ -1,0 +1,25 @@
+{
+  "name": "bunnyera-ai",
+  "version": "1.0.0",
+  "description": "BunnyEra AI brain repository for agents, prompts, workflows, and model configuration.",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/index.js",
+    "agents": "node src/agents.js",
+    "prompts": "node src/prompts.js",
+    "workflows": "node src/workflows.js",
+    "example:copy": "node examples/generate-product-copy.js",
+    "example:workflow": "node examples/run-workflow.js"
+  },
+  "keywords": [
+    "bunnyera",
+    "ai",
+    "agents",
+    "prompts",
+    "workflows",
+    "cross-border-ecommerce"
+  ],
+  "author": "BunnyEra",
+  "license": "MIT"
+}

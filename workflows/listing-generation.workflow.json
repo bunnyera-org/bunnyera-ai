@@ -1,0 +1,23 @@
+{
+  "id": "listing-generation",
+  "name": "Listing Generation Workflow",
+  "version": "1.0.0",
+  "description": "Generate ecommerce product listing content.",
+  "steps": [
+    {
+      "id": "generate-title",
+      "agent": "listing-agent",
+      "action": "Generate product title options."
+    },
+    {
+      "id": "generate-description",
+      "agent": "listing-agent",
+      "action": "Generate short description, long description, bullet points, and keywords."
+    },
+    {
+      "id": "review-listing-risk",
+      "agent": "risk-review-agent",
+      "action": "Review content for unsupported claims and platform risk."
+    }
+  ]
+}

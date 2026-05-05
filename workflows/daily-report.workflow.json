@@ -1,0 +1,28 @@
+{
+  "id": "daily-report",
+  "name": "Daily Report Workflow",
+  "version": "1.0.0",
+  "description": "Generate BunnyEra daily operation report.",
+  "steps": [
+    {
+      "id": "collect-status",
+      "agent": "ai-ceo",
+      "action": "Collect status from all departments."
+    },
+    {
+      "id": "finance-summary",
+      "agent": "finance-agent",
+      "action": "Summarize revenue, cost, and ROI."
+    },
+    {
+      "id": "risk-summary",
+      "agent": "risk-review-agent",
+      "action": "Summarize security and operational risks."
+    },
+    {
+      "id": "final-report",
+      "agent": "ai-ceo",
+      "action": "Generate final daily report."
+    }
+  ]
+}

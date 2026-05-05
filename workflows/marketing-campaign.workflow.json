@@ -1,0 +1,23 @@
+{
+  "id": "marketing-campaign",
+  "name": "Marketing Campaign Workflow",
+  "version": "1.0.0",
+  "description": "Generate ecommerce marketing campaign materials.",
+  "steps": [
+    {
+      "id": "campaign-angle",
+      "agent": "marketing-agent",
+      "action": "Generate campaign angles."
+    },
+    {
+      "id": "ad-copy",
+      "agent": "marketing-agent",
+      "action": "Generate ad headlines, primary text, and CTA options."
+    },
+    {
+      "id": "social-content",
+      "agent": "marketing-agent",
+      "action": "Generate social post and visual direction."
+    }
+  ]
+}

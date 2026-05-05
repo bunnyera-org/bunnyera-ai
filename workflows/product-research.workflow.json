@@ -1,0 +1,23 @@
+{
+  "id": "product-research",
+  "name": "Product Research Workflow",
+  "version": "1.0.0",
+  "description": "Find and evaluate ecommerce product opportunities.",
+  "steps": [
+    {
+      "id": "collect-market-signals",
+      "agent": "product-selection-agent",
+      "action": "Collect trend, demand, and competitor signals."
+    },
+    {
+      "id": "evaluate-opportunity",
+      "agent": "product-selection-agent",
+      "action": "Evaluate margin, logistics difficulty, competition, and localization potential."
+    },
+    {
+      "id": "generate-report",
+      "agent": "ai-ceo",
+      "action": "Summarize product opportunity and recommend next action."
+    }
+  ]
+}
