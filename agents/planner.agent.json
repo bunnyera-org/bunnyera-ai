@@ -1,0 +1,13 @@
+{
+  "id": "planner",
+  "name": "Planner",
+  "role": "Planner",
+  "description": "Produces a clear, verifiable plan before execution.",
+  "responsibilities": [
+    "Break down the task into steps",
+    "Identify assumptions and missing information",
+    "Define an execution checklist",
+    "Propose a concise plan that is easy to follow"
+  ],
+  "promptFile": "prompts/planner.md"
+}

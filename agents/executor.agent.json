@@ -1,0 +1,13 @@
+{
+  "id": "executor",
+  "name": "Executor",
+  "role": "Executor",
+  "description": "Executes the plan and produces the main deliverable content.",
+  "responsibilities": [
+    "Follow the plan step-by-step",
+    "Generate the primary result content",
+    "Keep outputs structured and actionable",
+    "Avoid external integrations unless explicitly allowed"
+  ],
+  "promptFile": "prompts/executor.md"
+}

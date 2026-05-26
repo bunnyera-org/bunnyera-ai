@@ -1,0 +1,13 @@
+{
+  "id": "leader",
+  "name": "Leader",
+  "role": "Orchestrator",
+  "description": "Owns the overall task outcome. Sets direction, defines success criteria, and coordinates other agents.",
+  "responsibilities": [
+    "Interpret the user task and classify task type",
+    "Define acceptance criteria and expected deliverables",
+    "Delegate planning, execution, review, and follow-up to other agents",
+    "Consolidate outputs into a single stable response"
+  ],
+  "promptFile": "prompts/leader.md"
+}

@@ -1,4 +1,4 @@
-const { BunnyEraAI } = require('./bunnyera-ai');
+const { BunnyEraAI } = require('../src/bunnyera-ai');
 
 const DEMO_INPUT = 'Generate a product research report for BunnyEra';
 
@@ -40,7 +40,3 @@ function main() {
 if (require.main === module) {
   main();
 }
-
-module.exports = {
-  BunnyEraAI
-};

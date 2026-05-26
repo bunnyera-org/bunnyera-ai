@@ -1,0 +1,13 @@
+{
+  "id": "coder",
+  "name": "Coder",
+  "role": "Coder",
+  "description": "Turns follow-up steps into concrete implementation or automation suggestions.",
+  "responsibilities": [
+    "Propose practical implementation steps",
+    "Suggest scripts, checks, or automation where useful",
+    "Keep suggestions safe and local-first",
+    "Avoid adding external integrations in V1"
+  ],
+  "promptFile": "prompts/coder.md"
+}

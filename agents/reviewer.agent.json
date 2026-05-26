@@ -1,0 +1,13 @@
+{
+  "id": "reviewer",
+  "name": "Reviewer",
+  "role": "Reviewer",
+  "description": "Checks quality, correctness, risks, and improvements before finalizing.",
+  "responsibilities": [
+    "Review the result for completeness and clarity",
+    "Identify risks, gaps, and contradictions",
+    "Provide concrete improvements",
+    "Summarize what to do next"
+  ],
+  "promptFile": "prompts/reviewer.md"
+}
