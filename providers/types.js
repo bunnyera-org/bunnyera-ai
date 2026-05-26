@@ -1,5 +1,9 @@
 const ProviderIds = Object.freeze({
-  MOCK: 'mock'
+  MOCK: 'mock',
+  OLLAMA: 'ollama',
+  OPENROUTER: 'openrouter',
+  GEMINI: 'gemini',
+  GROQ: 'groq'
 });
 
 const Models = Object.freeze({

@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-const { MockProvider, inferTaskType } = require('../providers/mock-provider');
+const { inferTaskType } = require('../providers/mock-provider');
+const { ProviderRouter } = require('../providers/provider-router');
 
 function readJsonFile(filePath) {
   const text = fs.readFileSync(filePath, 'utf8');
@@ -21,7 +22,7 @@ class BunnyEraAI {
     const opts = options || {};
     this.rootDir = opts.rootDir ? path.resolve(opts.rootDir) : path.resolve(__dirname, '..');
     this.agentsDir = path.join(this.rootDir, 'agents');
-    this.provider = opts.provider || new MockProvider();
+    this.providerRouter = opts.providerRouter || new ProviderRouter();
     this._agentsCache = null;
   }
 
@@ -43,7 +44,7 @@ class BunnyEraAI {
     return agents.find((a) => normalizeString(a.id) === targetId) || null;
   }
 
-  runTask(input) {
+  async runTask(input) {
     const taskInput = normalizeString(input);
     const taskType = inferTaskType(taskInput);
 
@@ -53,14 +54,16 @@ class BunnyEraAI {
     const reviewer = this._getAgentById('reviewer') || { id: 'reviewer', name: 'Reviewer', role: 'Reviewer' };
     const coder = this._getAgentById('coder') || { id: 'coder', name: 'Coder', role: 'Coder' };
 
-    const planRes = this.provider.run({
+    const session = await this.providerRouter.createSession();
+
+    const planRes = await session.run({
       agent: planner,
       taskType,
       input: taskInput,
       stage: 'plan'
     });
 
-    const resultRes = this.provider.run({
+    const resultRes = await session.run({
       agent: executor,
       taskType,
       input: taskInput,
@@ -68,7 +71,7 @@ class BunnyEraAI {
       context: { plan: planRes.text }
     });
 
-    const reviewRes = this.provider.run({
+    const reviewRes = await session.run({
       agent: reviewer,
       taskType,
       input: taskInput,
@@ -76,7 +79,7 @@ class BunnyEraAI {
       context: { plan: planRes.text, result: resultRes.text }
     });
 
-    const nextRes = this.provider.run({
+    const nextRes = await session.run({
       agent: coder,
       taskType,
       input: taskInput,
@@ -91,8 +94,10 @@ class BunnyEraAI {
       result: normalizeString(resultRes.text),
       review: normalizeString(reviewRes.text),
       nextSteps: normalizeString(nextRes.text),
-      provider: this.provider.id,
-      model: this.provider.model
+      provider: session.usedProvider,
+      model: normalizeString(planRes.model),
+      fallbackUsed: session.fallbackUsed,
+      providerStatus: session.providerStatus
     };
   }
 }

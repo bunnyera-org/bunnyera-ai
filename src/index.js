@@ -7,6 +7,8 @@ function printDemoOutput(output) {
   console.log('Task Type:', output.taskType);
   console.log('Provider:', output.provider);
   console.log('Model:', output.model);
+  console.log('Fallback Used:', output.fallbackUsed);
+  console.log('Provider Status:', JSON.stringify(output.providerStatus, null, 2));
   console.log('');
   console.log('Plan:');
   console.log(output.plan);
@@ -21,13 +23,13 @@ function printDemoOutput(output) {
   console.log(output.nextSteps);
 }
 
-function main() {
+async function main() {
   const ai = new BunnyEraAI();
   const agents = ai.loadAgents();
-  const output = ai.runTask(DEMO_INPUT);
+  const output = await ai.runTask(DEMO_INPUT);
 
-  console.log('BunnyEra AI Brain V1');
-  console.log('Local demo (mock provider only)');
+  console.log('BunnyEra AI Brain V1.1');
+  console.log('Local demo (provider router with fallback)');
   console.log('');
   console.log('Input Task:');
   console.log(DEMO_INPUT);
@@ -38,7 +40,10 @@ function main() {
 }
 
 if (require.main === module) {
-  main();
+  main().catch((err) => {
+    console.error(String(err && err.stack ? err.stack : err));
+    process.exitCode = 1;
+  });
 }
 
 module.exports = {

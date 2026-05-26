@@ -140,6 +140,10 @@ class MockProvider {
     this.options = options || {};
   }
 
+  async getStatus() {
+    return { id: this.id, available: true, model: this.model };
+  }
+
   run(params) {
     const input = normalizeText(params && params.input);
     const taskType = normalizeText(params && params.taskType) || inferTaskType(input);
