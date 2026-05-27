@@ -1,4 +1,4 @@
-# bunnyera-ai (BunnyEra AI Brain V1)
+# bunnyera-ai (BunnyEra AI Brain V1 / V1.1)
 
 这个仓库是 BunnyEra AI Brain V1（公司大脑/知识与流程资产仓库）。
 
@@ -13,6 +13,14 @@
 - 本地可演示：仅使用 mock provider，不依赖网络与第三方 API
 - 五角色 Agent（Leader / Planner / Executor / Reviewer / Coder）
 - 保留并继续使用现有目录：`docs/`、`examples/`、`models/`、`prompts/`、`src/`、`workflows/`
+
+## V1.1 功能（多 Provider 免费优先架构）
+
+V1.1 引入 Provider Router，用于在多 Provider 之间做选择，并在不可用时自动 fallback 到 mock：
+- 默认 Provider 仍然是 `mock`
+- 通过环境变量 `AI_PROVIDER` 选择：`mock | ollama | openrouter | gemini | groq`
+- 没有 API Key / 外部服务不可用时，不允许 demo 崩溃，必须 fallback 到 `mock`
+- demo 输出会展示 `Fallback Used` 与 `Provider Status`
 
 ## 目录结构（关键）
 
@@ -43,13 +51,18 @@ bunnyera-ai/
 - `agents/reviewer.agent.json` -> `prompts/reviewer.md`
 - `agents/coder.agent.json` -> `prompts/coder.md`
 
-## Provider 说明（V1）
+## Provider 说明（V1 / V1.1）
 
-V1 只使用 mock provider：
-- Provider: `mock`
-- Model: `mock-brain-v1`
-- 不调用真实 OpenAI / OpenRouter / Gemini / Groq
-- 不读取/不需要任何真实 API Key
+Provider 区别（V1.1）：
+- `mock`：永久可用，本地模拟输出（最终 fallback），Model 固定 `mock-brain-v1`
+- `ollama`：本地 Ollama，无需 API Key；服务未启动时会被判定为 unavailable 并 fallback mock
+- `openrouter`：需要 `OPENROUTER_API_KEY`；OpenAI-compatible `chat/completions`
+- `gemini`：需要 `GEMINI_API_KEY`；使用 Google Generative Language API
+- `groq`：需要 `GROQ_API_KEY`；OpenAI-compatible `chat/completions`
+
+注意：
+- 免费平台额度可能变化，V1.1 不承诺任何外部额度稳定性
+- 默认仍然是 mock，且所有真实 provider 失败时必须 fallback mock
 
 ## 本地运行方式
 
@@ -102,6 +115,8 @@ demo 输出必须包含：
 - 下一步建议
 - Provider: mock
 - Model: mock-brain-v1
+- Fallback Used
+- Provider Status
 
 ## V1 不做什么（明确非目标）
 
