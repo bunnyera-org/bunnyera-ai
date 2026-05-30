@@ -22,6 +22,16 @@ V1.1 引入 Provider Router，用于在多 Provider 之间做选择，并在不�
 - 没有 API Key / 外部服务不可用时，不允许 demo 崩溃，必须 fallback 到 `mock`
 - demo 输出会展示 `Fallback Used` 与 `Provider Status`
 
+## V1.2 功能（Code Health Monitor）
+
+V1.2 增加对 `bunnyera-console` 的只读健康检查：
+- 只读扫描整个仓库（默认路径 `D:\GitHub\BunnyEraRepos\bunnyera-console`）
+- 不自动修改、不写入被检查仓库任何文件
+- 不读取 `.env/.env.local/secret/key` 等敏感文件内容（只记录文件名/路径）
+- 限制扫描规模：单文件最大 50KB，总扫描文件上限 500，忽略 `node_modules/.git/.next/dist/build/coverage`
+- 本地生成报告到 `reports/` 并通过 `notification` 对象提示是否需要处理
+- 后续可扩展接入 Email / Telegram / Console Notify Center（V1.2 不接真实外部通知）
+
 ## 目录结构（关键）
 
 ```txt
@@ -90,6 +100,12 @@ npm run demo
 npm run build
 ```
 
+运行 console 健康检查（只读）：
+
+```powershell
+npm run check:console
+```
+
 ## 验收标准（V1）
 
 必须成功运行：
@@ -127,6 +143,8 @@ demo 输出必须包含：
 - 不接真实 OpenAI / OpenRouter / Gemini / Groq
 - 不改服务器
 - 不改 bunnyera-console
+- V1.2 不接真实 Telegram
+- V1.2 不接真实 Email
 
 ## License
 
