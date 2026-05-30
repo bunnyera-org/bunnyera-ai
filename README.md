@@ -1,4 +1,4 @@
-# bunnyera-ai (BunnyEra AI Brain V1 / V1.1)
+# bunnyera-ai (BunnyEra AI Brain V1 / V1.3)
 
 这个仓库是 BunnyEra AI Brain V1（公司大脑/知识与流程资产仓库）。
 
@@ -31,6 +31,72 @@ V1.2 增加对 `bunnyera-console` 的只读健康检查：
 - 限制扫描规模：单文件最大 50KB，总扫描文件上限 500，忽略 `node_modules/.git/.next/dist/build/coverage`
 - 本地生成报告到 `reports/` 并通过 `notification` 对象提示是否需要处理
 - 后续可扩展接入 Email / Telegram / Console Notify Center（V1.2 不接真实外部通知）
+
+## V1.3 功能（Console Contract Alignment）
+
+V1.3 对齐 `bunnyera-console-v2` 当前的 AI Assistant mock API 契约：
+- 参考目标：`bunnyera-console-v2` master / `v0.3.5-console-v2-demo-complete`
+- Console V2 当前调用语义：`POST /api/ai/run-task`
+- Console V2 当前请求字段：`taskId`、`agentRole`、`taskType`、`input`、`context`、`options`
+- Console V2 当前响应字段：`requestId`、`taskId`、`agentRole`、`taskType`、`provider`、`result`、`error`、`createdAt`
+- `BunnyEraAI.runTask()` 现在可接收 Console V2 风格请求对象，也继续支持旧的字符串输入
+- 输出增加 `success`、`data`、`error`、`meta` 包装，`meta.contractVersion = v1.3.0-console-contract-alignment`
+- 顶层保留 Console V2 风格 `provider` 与 `result`，其中 `result` 包含 `selectedAgent`、`taskSummary`、`suggestedPlan`、`nextSteps`、`providerStatus`、`summary`、`plan`、`rawText`
+- `data` 中保留旧 demo 依赖字段：`agentName`、`taskType`、`plan`、`result`、`review`、`nextSteps`、`provider`、`model`、`fallbackUsed`、`providerStatus`
+- 顶层 `result` 按 Console V2 契约保留为对象；旧顶层结果正文同步提供在 `legacyResult`
+- Provider Router、mock fallback、V1.2 Code Health Monitor 均保留
+
+成功响应示例结构：
+
+```json
+{
+  "success": true,
+  "data": {
+    "agentName": "Leader",
+    "agentRole": "Planner",
+    "taskType": "planning",
+    "plan": "...",
+    "result": "...",
+    "review": "...",
+    "nextSteps": "...",
+    "provider": {
+      "mode": "mock",
+      "name": "bunnyera-ai-router-mock",
+      "available": true,
+      "fallbackUsed": false
+    },
+    "model": "mock-brain-v1",
+    "fallbackUsed": false,
+    "providerStatus": {}
+  },
+  "error": null,
+  "meta": {
+    "source": "bunnyera-ai",
+    "contractVersion": "v1.3.0-console-contract-alignment"
+  },
+  "requestId": "req_...",
+  "taskId": "task_...",
+  "agentRole": "Planner",
+  "taskType": "planning",
+  "provider": {
+    "mode": "mock",
+    "name": "bunnyera-ai-router-mock",
+    "available": true,
+    "fallbackUsed": false
+  },
+  "result": {
+    "selectedAgent": "Planner",
+    "taskSummary": "...",
+    "suggestedPlan": [],
+    "nextSteps": [],
+    "providerStatus": {},
+    "summary": "...",
+    "plan": [],
+    "rawText": "..."
+  },
+  "createdAt": "2026-05-30T00:00:00.000Z"
+}
+```
 
 ## 目录结构（关键）
 
@@ -106,6 +172,12 @@ npm run build
 npm run check:console
 ```
 
+运行 Console V2 contract 示例：
+
+```powershell
+node examples/run-console-contract.js
+```
+
 ## 验收标准（V1）
 
 必须成功运行：
@@ -114,6 +186,7 @@ npm run check:console
 npm install
 npm run build
 npm run demo
+node examples/run-console-contract.js
 ```
 
 demo 固定输入：
@@ -133,6 +206,8 @@ demo 输出必须包含：
 - Model: mock-brain-v1
 - Fallback Used
 - Provider Status
+- V1.3 Console contract wrapper: `success/data/error/meta`
+- Console V2 fields: `requestId/taskId/agentRole/provider/result/createdAt`
 
 ## V1 不做什么（明确非目标）
 
@@ -143,6 +218,7 @@ demo 输出必须包含：
 - 不接真实 OpenAI / OpenRouter / Gemini / Groq
 - 不改服务器
 - 不改 bunnyera-console
+- 不改 bunnyera-console-v2
 - V1.2 不接真实 Telegram
 - V1.2 不接真实 Email
 
