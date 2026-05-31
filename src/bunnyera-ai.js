@@ -3,7 +3,7 @@ const path = require('path');
 const { inferTaskType } = require('../providers/mock-provider');
 const { ProviderRouter } = require('../providers/provider-router');
 
-const CONTRACT_VERSION = 'v1.4.0-free-provider-runtime';
+const CONTRACT_VERSION = 'v1.5.0-provider-selection-support';
 const SOURCE = 'bunnyera-ai';
 const CONSOLE_TASK_TYPES = new Set(['strategy', 'planning', 'execution', 'review', 'coding', 'general']);
 
@@ -166,6 +166,10 @@ class BunnyEraAI {
     const requestId = createRequestId();
     const taskId = normalizeString(request.taskId) || createTaskId();
     const agentRole = normalizeAgentRole(request.agentRole || request.agentName);
+    const providerSelection = {
+      provider: request.provider,
+      providerMode: request.providerMode
+    };
 
     if (!taskInput) {
       return createErrorOutput({
@@ -186,7 +190,7 @@ class BunnyEraAI {
       const reviewer = this._getAgentById('reviewer') || { id: 'reviewer', name: 'Reviewer', role: 'Reviewer' };
       const coder = this._getAgentById('coder') || { id: 'coder', name: 'Coder', role: 'Coder' };
 
-      const session = await this.providerRouter.createSession();
+      const session = await this.providerRouter.createSession(providerSelection);
 
       const planRes = await session.run({
         agent: planner,

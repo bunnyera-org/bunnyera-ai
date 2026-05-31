@@ -5,6 +5,7 @@ const REQUEST = {
   agentRole: 'Planner',
   taskType: 'planning',
   input: 'Create a practical launch checklist for BunnyEra AI free provider runtime.',
+  provider: 'mock',
   context: {
     source: 'bunnyera-ai',
     version: CONTRACT_VERSION
@@ -38,6 +39,9 @@ function assertProviderRuntime(output) {
   if (!providerStatus.name) failures.push('providerStatus.name must be present');
   if (typeof providerStatus.available !== 'boolean') failures.push('providerStatus.available must be boolean');
   if (typeof providerStatus.fallbackUsed !== 'boolean') failures.push('providerStatus.fallbackUsed must be boolean');
+  if (providerStatus.requestedProviderSource !== 'input.provider') {
+    failures.push('providerStatus.requestedProviderSource must be input.provider for this demo');
+  }
 
   if (failures.length > 0) {
     const err = new Error(`Provider runtime check failed:\n- ${failures.join('\n- ')}`);
@@ -52,9 +56,10 @@ async function main() {
 
   assertProviderRuntime(output);
 
-  console.log('BunnyEra AI V1.4 Free Provider Runtime');
+  console.log('BunnyEra AI V1.5 Free Provider Runtime');
   console.log('');
   console.log('AI_PROVIDER:', process.env.AI_PROVIDER || 'mock');
+  console.log('Input Provider:', REQUEST.provider);
   console.log('Provider Status:', JSON.stringify(output.providerStatus, null, 2));
   console.log('');
   console.log(JSON.stringify(output, null, 2));

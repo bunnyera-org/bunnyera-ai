@@ -13,6 +13,24 @@ function isSupportedProvider(id) {
   return Object.values(ProviderIds).includes(id);
 }
 
+function resolveProviderSelection(options) {
+  const opts = options || {};
+  const inputProvider = normalizeProviderId(opts.provider);
+  const inputProviderMode = normalizeProviderId(opts.providerMode);
+  const envProvider = normalizeProviderId(process.env.AI_PROVIDER);
+
+  if (inputProvider) {
+    return { raw: inputProvider, source: 'input.provider' };
+  }
+  if (inputProviderMode) {
+    return { raw: inputProviderMode, source: 'input.providerMode' };
+  }
+  if (envProvider) {
+    return { raw: envProvider, source: 'env.AI_PROVIDER' };
+  }
+  return { raw: ProviderIds.MOCK, source: 'default.mock' };
+}
+
 function safeErrorMessage(err) {
   if (!err) return 'unknown error';
   if (typeof err === 'string') return err;
@@ -71,8 +89,9 @@ class ProviderRouter {
     this.mockProvider = new MockProvider();
   }
 
-  async createSession() {
-    const requestedRaw = normalizeProviderId(process.env.AI_PROVIDER || ProviderIds.MOCK);
+  async createSession(options) {
+    const selection = resolveProviderSelection(options);
+    const requestedRaw = selection.raw;
     const requestedProvider = isSupportedProvider(requestedRaw) ? requestedRaw : ProviderIds.MOCK;
 
     let primary = this.mockProvider;
@@ -86,12 +105,15 @@ class ProviderRouter {
 
     const providerStatus = {
       requestedProvider: requestedRaw || ProviderIds.MOCK,
+      requestedProviderSource: selection.source,
       usedProvider: primary.id,
       fallbackUsed: false,
       mode: primary.id,
       name: primary.id === ProviderIds.MOCK ? 'bunnyera-ai-router-mock' : `bunnyera-ai-router-${primary.id}`,
       available: Boolean(primaryStatus.available),
-      reason: primaryStatus.reason || `provider "${primary.id}" selected`,
+      reason:
+        primaryStatus.reason ||
+        `provider "${primary.id}" selected from ${selection.source}`,
       error: null,
       providers: {
         [ProviderIds.MOCK]: mockStatus,
@@ -110,7 +132,7 @@ class ProviderRouter {
       providerStatus.mode = usedProvider;
       providerStatus.name = 'bunnyera-ai-router-mock';
       providerStatus.available = true;
-      providerStatus.reason = `unknown provider "${requestedRaw}", fallback to mock`;
+      providerStatus.reason = `unknown provider "${requestedRaw}" from ${selection.source}, fallback to mock`;
       primary = this.mockProvider;
     } else if (!primaryStatus.available) {
       fallbackUsed = true;
@@ -120,7 +142,7 @@ class ProviderRouter {
       providerStatus.mode = usedProvider;
       providerStatus.name = 'bunnyera-ai-router-mock';
       providerStatus.available = true;
-      providerStatus.reason = `provider "${requestedProvider}" unavailable, fallback to mock`;
+      providerStatus.reason = `provider "${requestedProvider}" from ${selection.source} unavailable, fallback to mock`;
       primary = this.mockProvider;
     }
 
