@@ -3,7 +3,7 @@ const path = require('path');
 const { inferTaskType } = require('../providers/mock-provider');
 const { ProviderRouter } = require('../providers/provider-router');
 
-const CONTRACT_VERSION = 'v1.6.0-output-quality-prompt-control';
+const CONTRACT_VERSION = 'v1.7.0-business-output-templates';
 const SOURCE = 'bunnyera-ai';
 const CONSOLE_TASK_TYPES = new Set(['strategy', 'planning', 'execution', 'review', 'coding', 'general']);
 

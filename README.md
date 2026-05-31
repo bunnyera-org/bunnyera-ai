@@ -1,4 +1,4 @@
-# bunnyera-ai (BunnyEra AI Brain V1 / V1.6)
+# bunnyera-ai (BunnyEra AI Brain V1 / V1.7)
 
 这个仓库是 BunnyEra AI Brain V1（公司大脑/知识与流程资产仓库）。
 
@@ -82,6 +82,33 @@ V1.6 在保留 V1.5 provider selection、V1.4 free provider runtime 与 V1.3 Con
 - 不读取、不输出、不推断 API Key；没有 key 或调用失败仍 fallback 到 mock
 - `meta.contractVersion = v1.6.0-output-quality-prompt-control`
 
+## V1.7 功能（Business Output Templates）
+
+V1.7 在保留 V1.6 output quality prompt control、V1.5 provider selection、V1.4 provider runtime 与 V1.3 Console contract 的基础上，新增 BunnyEra 业务输出模板，让输出更像公司内部系统结果。
+
+当前内置第一个模板：BunnyEra Company Status Report Template。
+
+触发意图包括：
+- 公司状态报告
+- Company OS 状态
+- AI Company OS 当前状态
+- Console V2 状态
+- AI Brain 状态
+- Provider / fallback 状态
+
+模板输出结构：
+- 标题
+- 已验证事实
+- 当前系统状态
+- Provider 状态
+- 风险与限制
+- 建议下一步
+- 未提供或未确认信息
+
+模板继续遵守 V1.6 事实约束：不编造日期、平台、版本、日志结果、测试人员或未验证部署状态；`providerStatus` 中已有的 `mode/name/available/fallbackUsed/requestedProviderSource/reason/error/model` 可以作为已验证事实使用。
+
+`meta.contractVersion = v1.7.0-business-output-templates`。
+
 成功响应示例结构：
 
 ```json
@@ -108,7 +135,7 @@ V1.6 在保留 V1.5 provider selection、V1.4 free provider runtime 与 V1.3 Con
   "error": null,
   "meta": {
     "source": "bunnyera-ai",
-    "contractVersion": "v1.6.0-output-quality-prompt-control"
+    "contractVersion": "v1.7.0-business-output-templates"
   },
   "requestId": "req_...",
   "taskId": "task_...",
@@ -163,9 +190,9 @@ bunnyera-ai/
 - `agents/reviewer.agent.json` -> `prompts/reviewer.md`
 - `agents/coder.agent.json` -> `prompts/coder.md`
 
-## Provider 说明（V1.6）
+## Provider 说明（V1.7）
 
-Provider 区别（V1.6）：
+Provider 区别（V1.7）：
 - `mock`：永久可用，本地模拟输出（最终 fallback），Model 固定 `mock-brain-v1`
 - `ollama`：本地 Ollama，无需 API Key；服务未启动时会被判定为 unavailable 并 fallback mock
 - `openrouter`：需要 `OPENROUTER_API_KEY`；OpenAI-compatible `chat/completions`
@@ -220,9 +247,10 @@ $env:OLLAMA_MODEL="qwen2.5:7b"
 ```
 
 注意：
-- 免费平台额度可能变化，V1.6 不承诺任何外部额度稳定性
+- 免费平台额度可能变化，V1.7 不承诺任何外部额度稳定性
 - 默认仍然是 mock，且所有真实 provider 失败时必须 fallback mock
 - 真实 provider 输出必须遵守 V1.6 事实约束；缺失上下文时使用 `未提供` 或 `未确认`
+- 公司状态类任务会优先使用 V1.7 Business Output Template
 
 ## 本地运行方式
 
@@ -262,13 +290,13 @@ npm run check:console
 node examples/run-console-contract.js
 ```
 
-运行 V1.6 Provider Runtime 示例：
+运行 V1.7 Provider Runtime 示例：
 
 ```powershell
 node examples/run-provider-runtime.js
 ```
 
-运行 V1.6 Provider Selection 示例：
+运行 V1.7 Provider Selection 示例：
 
 ```powershell
 node examples/run-provider-selection.js
@@ -278,6 +306,12 @@ node examples/run-provider-selection.js
 
 ```powershell
 node examples/run-output-quality.js
+```
+
+运行 V1.7 Company Status Report Template 示例：
+
+```powershell
+node examples/run-company-status-report.js
 ```
 
 ## 验收标准（V1）
@@ -292,6 +326,7 @@ node examples/run-console-contract.js
 node examples/run-provider-runtime.js
 node examples/run-provider-selection.js
 node examples/run-output-quality.js
+node examples/run-company-status-report.js
 ```
 
 demo 固定输入：
@@ -311,9 +346,10 @@ demo 输出必须包含：
 - Model: mock-brain-v1
 - Fallback Used
 - Provider Status，包含 `mode/name/available/fallbackUsed/reason/error/requestedProviderSource`
-- V1.6 Console contract wrapper: `success/data/error/meta`
+- V1.7 Console contract wrapper: `success/data/error/meta`
 - Console V2 fields: `requestId/taskId/agentRole/provider/result/createdAt`
 - Output Quality Prompt Control: 不编造日期、版本、平台、测试人员或日志结果；缺失信息标记为 `未提供` 或 `未确认`
+- Business Output Templates: 公司状态类任务输出包含标题、已验证事实、当前系统状态、Provider 状态、风险与限制、建议下一步、未提供或未确认信息
 
 ## V1 不做什么（明确非目标）
 
@@ -321,7 +357,7 @@ demo 输出必须包含：
 - 不接 Telegram
 - 不接支付
 - 不放真实 API Key
-- 不接真实 OpenAI 官方付费 Provider（V1.6 仅支持免费优先 provider runtime 配置）
+- 不接真实 OpenAI 官方付费 Provider（V1.7 仅支持免费优先 provider runtime 配置）
 - 不改服务器
 - 不改 bunnyera-console
 - 不改 bunnyera-console-v2

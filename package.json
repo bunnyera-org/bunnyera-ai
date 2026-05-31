@@ -1,6 +1,6 @@
 {
   "name": "bunnyera-ai",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "BunnyEra AI brain repository for agents, prompts, workflows, and model configuration.",
   "main": "src/index.js",
   "type": "commonjs",
@@ -13,7 +13,7 @@
     "workflows": "node src/workflows.js",
     "example:copy": "node examples/generate-product-copy.js",
     "example:workflow": "node examples/run-workflow.js",
-    "build": "node -c src/index.js && node -c src/bunnyera-ai.js && node -c src/codebase-scanner.js && node -c src/code-health-monitor.js && node -c providers/types.js && node -c providers/mock-provider.js && node -c providers/prompt-quality.js && node -c providers/provider-router.js && node -c providers/ollama-provider.js && node -c providers/openrouter-provider.js && node -c providers/gemini-provider.js && node -c providers/groq-provider.js && node -c examples/run-demo.js && node -c examples/check-console.js && node -c examples/run-console-contract.js && node -c examples/run-provider-runtime.js && node -c examples/run-provider-selection.js && node -c examples/run-output-quality.js",
+    "build": "node -c src/index.js && node -c src/bunnyera-ai.js && node -c src/codebase-scanner.js && node -c src/code-health-monitor.js && node -c templates/company-status-report.js && node -c providers/types.js && node -c providers/mock-provider.js && node -c providers/prompt-quality.js && node -c providers/provider-router.js && node -c providers/ollama-provider.js && node -c providers/openrouter-provider.js && node -c providers/gemini-provider.js && node -c providers/groq-provider.js && node -c examples/run-demo.js && node -c examples/check-console.js && node -c examples/run-console-contract.js && node -c examples/run-provider-runtime.js && node -c examples/run-provider-selection.js && node -c examples/run-output-quality.js && node -c examples/run-company-status-report.js",
     "test": "npm run build && npm run demo"
   },
   "keywords": [

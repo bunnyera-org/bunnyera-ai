@@ -1,3 +1,8 @@
+const {
+  createCompanyStatusReportInstructions,
+  isCompanyStatusReportIntent
+} = require('../templates/company-status-report');
+
 function normalizeString(value) {
   return String(value || '').trim();
 }
@@ -60,10 +65,15 @@ function createOutputQualityInstructions() {
 function createProviderSystemPrompt(agent) {
   const role = agent && agent.role ? agent.role : 'Agent';
   return [
-    `You are BunnyEra AI Brain V1.6. Role=${role}.`,
+    `You are BunnyEra AI Brain V1.7. Role=${role}.`,
     createOutputQualityInstructions(),
     'Respond with clear structured text.'
   ].join('\n\n');
+}
+
+function createBusinessTemplatePrompt(input) {
+  if (!isCompanyStatusReportIntent(input)) return '';
+  return createCompanyStatusReportInstructions();
 }
 
 function createProviderUserPrompt(params) {
@@ -75,6 +85,7 @@ function createProviderUserPrompt(params) {
     `Stage: ${normalizeString(opts.stage) || 'general'}`,
     `AgentRole: ${normalizeString(agent.role || agent.name) || '未提供'}`,
     `Input:\n${normalizeString(opts.input) || '未提供'}`,
+    createBusinessTemplatePrompt(opts.input),
     `Context:\n${formatContext(context)}`,
     `ProviderStatus:\n${formatProviderStatus(opts.providerStatus)}`,
     `Plan:\n${normalizeString(context.plan) || '未提供'}`,
@@ -84,6 +95,7 @@ function createProviderUserPrompt(params) {
 }
 
 module.exports = {
+  createBusinessTemplatePrompt,
   createOutputQualityInstructions,
   createProviderSystemPrompt,
   createProviderUserPrompt,

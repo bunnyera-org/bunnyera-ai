@@ -1,4 +1,5 @@
 const { ProviderIds, Models } = require('./types');
+const { isCompanyStatusReportIntent, renderCompanyStatusReport } = require('../templates/company-status-report');
 
 function normalizeText(text) {
   return String(text || '').trim();
@@ -18,6 +19,7 @@ function stageLabel(stage) {
 
 function inferTaskType(input) {
   const text = normalizeText(input).toLowerCase();
+  if (isCompanyStatusReportIntent(text)) return 'company_status_report';
   if (text.includes('product research report')) return 'product_research_report';
   if (text.includes('research report')) return 'research_report';
   if (text.includes('marketing')) return 'marketing_task';
@@ -45,10 +47,20 @@ function makePlan(taskType, input) {
     ]).join('\n- ').replace(/^/, '- ');
   }
 
+  if (taskType === 'company_status_report') {
+    return safeLines([
+      'Collect only verified input, context, and providerStatus fields',
+      'Separate verified facts from recommendations',
+      'Summarize current system status without inventing date, platform, version, logs, or tester',
+      'Report provider mode, name, availability, fallbackUsed, requestedProviderSource, reason, error, and model when present',
+      'List missing or unconfirmed information explicitly'
+    ]).join('\n- ').replace(/^/, '- ');
+  }
+
   return safeLines(lines).join('\n- ').replace(/^/, '- ');
 }
 
-function makeResult(taskType) {
+function makeResult(taskType, input, providerStatus) {
   if (taskType === 'product_research_report') {
     return [
       '## Executive Summary',
@@ -75,6 +87,10 @@ function makeResult(taskType) {
       '- Risk: Users expect "real model quality" immediately. Mitigation: clearly label mock outputs and acceptance criteria.',
       '- Risk: Over-expansion into multi-provider too early. Mitigation: freeze V1 scope and document non-goals.'
     ].join('\n');
+  }
+
+  if (taskType === 'company_status_report') {
+    return renderCompanyStatusReport({ input, providerStatus });
   }
 
   return [
@@ -152,7 +168,7 @@ class MockProvider {
 
     let text = '';
     if (stage === 'plan') text = makePlan(taskType, input);
-    else if (stage === 'execute') text = makeResult(taskType);
+    else if (stage === 'execute') text = makeResult(taskType, input, params && params.providerStatus);
     else if (stage === 'review') text = makeReview(taskType);
     else if (stage === 'next') text = makeNextSteps(taskType);
     else text = `(${stageLabel(stage)}) Mock response for taskType=${taskType}`;
