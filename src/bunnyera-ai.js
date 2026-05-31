@@ -3,7 +3,7 @@ const path = require('path');
 const { inferTaskType } = require('../providers/mock-provider');
 const { ProviderRouter } = require('../providers/provider-router');
 
-const CONTRACT_VERSION = 'v1.3.0-console-contract-alignment';
+const CONTRACT_VERSION = 'v1.4.0-free-provider-runtime';
 const SOURCE = 'bunnyera-ai';
 const CONSOLE_TASK_TYPES = new Set(['strategy', 'planning', 'execution', 'review', 'coding', 'general']);
 
@@ -61,14 +61,23 @@ function createConsoleProvider(session, model) {
     providerStatus.providers && providerStatus.usedProvider
       ? providerStatus.providers[providerStatus.usedProvider]
       : null;
+  const providerName =
+    session.usedProvider === 'mock' ? 'bunnyera-ai-router-mock' : `bunnyera-ai-router-${session.usedProvider}`;
+  const reason =
+    providerStatus.reason ||
+    providerStatus.error?.message ||
+    (providerInfo && providerInfo.reason) ||
+    'BunnyEra AI provider router response.';
 
   return {
     mode: session.usedProvider || 'mock',
-    name: session.usedProvider === 'mock' ? 'bunnyera-ai-router-mock' : session.usedProvider,
+    name: providerName,
     available: providerInfo && typeof providerInfo.available === 'boolean' ? providerInfo.available : true,
     fallbackUsed: Boolean(session.fallbackUsed),
+    reason,
+    error: providerStatus.error ? providerStatus.error.message : null,
     latencyMs: providerStatus.latencyMs,
-    message: providerStatus.reason || providerStatus.error?.message || 'BunnyEra AI provider router response.',
+    message: reason,
     model: normalizeString(model)
   };
 }
@@ -87,6 +96,16 @@ function createErrorOutput(params) {
     code: params.code || 'TASK_FAILED',
     retryable: Boolean(params.retryable)
   };
+  const providerStatus = {
+    requestedProvider: 'mock',
+    usedProvider: 'mock',
+    mode: 'mock',
+    name: 'bunnyera-ai-router-mock',
+    available: false,
+    fallbackUsed: true,
+    reason: params.message,
+    error: params.message
+  };
 
   return {
     success: false,
@@ -102,8 +121,12 @@ function createErrorOutput(params) {
       name: 'bunnyera-ai-router-mock',
       available: false,
       fallbackUsed: true,
+      reason: params.message,
+      error: params.message,
       message: params.message
     },
+    fallbackUsed: true,
+    providerStatus,
     createdAt: now
   };
 }

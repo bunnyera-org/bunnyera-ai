@@ -58,7 +58,7 @@ async function main() {
 
   assertContract(output);
 
-  console.log('BunnyEra AI V1.3 Console Contract Alignment');
+  console.log('BunnyEra AI Console Contract Alignment');
   console.log('');
   console.log(JSON.stringify(output, null, 2));
 }

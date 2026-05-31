@@ -1,4 +1,4 @@
-# bunnyera-ai (BunnyEra AI Brain V1 / V1.3)
+# bunnyera-ai (BunnyEra AI Brain V1 / V1.4)
 
 这个仓库是 BunnyEra AI Brain V1（公司大脑/知识与流程资产仓库）。
 
@@ -10,7 +10,7 @@
 ## V1 功能
 
 - 统一入口：`BunnyEraAI.runTask(input)` 输出结构稳定
-- 本地可演示：仅使用 mock provider，不依赖网络与第三方 API
+- 本地可演示：默认使用 mock provider，不依赖网络与第三方 API
 - 五角色 Agent（Leader / Planner / Executor / Reviewer / Coder）
 - 保留并继续使用现有目录：`docs/`、`examples/`、`models/`、`prompts/`、`src/`、`workflows/`
 
@@ -46,6 +46,19 @@ V1.3 对齐 `bunnyera-console-v2` 当前的 AI Assistant mock API 契约：
 - 顶层 `result` 按 Console V2 契约保留为对象；旧顶层结果正文同步提供在 `legacyResult`
 - Provider Router、mock fallback、V1.2 Code Health Monitor 均保留
 
+## V1.4 功能（Free Provider Runtime）
+
+V1.4 在不破坏 V1.3 Console contract 的前提下，补齐真实免费 Provider runtime：
+- `BunnyEraAI.runTask()` 继续输出 `success/data/error/meta`，并保留旧字段兼容
+- `meta.contractVersion = v1.4.0-free-provider-runtime`
+- Provider Router 继续支持 `mock | openrouter | groq | gemini | ollama`
+- 默认仍为 `mock`，不需要密钥即可运行 demo
+- 选择云端 provider 但没有 API Key 时，自动 fallback 到 `mock`，不抛出到 Console
+- API 调用失败或本地 Ollama 不可用时，自动 fallback 到 `mock`，不让 demo 崩溃
+- `providerStatus` 明确包含 `mode`、`name`、`available`、`fallbackUsed`、`reason`、`error`
+- Console V2 可继续读取 `provider.mode`、`provider.name`、`fallbackUsed`、`available`
+- Provider Router、mock fallback、V1.2 Code Health Monitor 均保留
+
 成功响应示例结构：
 
 ```json
@@ -72,7 +85,7 @@ V1.3 对齐 `bunnyera-console-v2` 当前的 AI Assistant mock API 契约：
   "error": null,
   "meta": {
     "source": "bunnyera-ai",
-    "contractVersion": "v1.3.0-console-contract-alignment"
+    "contractVersion": "v1.4.0-free-provider-runtime"
   },
   "requestId": "req_...",
   "taskId": "task_...",
@@ -103,10 +116,10 @@ V1.3 对齐 `bunnyera-console-v2` 当前的 AI Assistant mock API 契约：
 ```txt
 bunnyera-ai/
 ├─ agents/                     # V1：Agent 定义（JSON）
-├─ providers/                  # V1：Provider（当前仅 mock）
+├─ providers/                  # Provider Router、mock fallback 与免费 provider runtime
 ├─ prompts/                    # Prompt 资产（含 V1 五个角色 prompt）
 ├─ workflows/                  # Workflow 定义（JSON）
-├─ models/                     # 模型注册表配置（V1 不接真实 provider）
+├─ models/                     # 模型注册表配置
 ├─ src/                        # CLI 与 BunnyEraAI 入口
 ├─ examples/                   # 示例脚本（含 run-demo.js）
 └─ docs/                       # 说明文档
@@ -127,17 +140,46 @@ bunnyera-ai/
 - `agents/reviewer.agent.json` -> `prompts/reviewer.md`
 - `agents/coder.agent.json` -> `prompts/coder.md`
 
-## Provider 说明（V1 / V1.1）
+## Provider 说明（V1.4）
 
-Provider 区别（V1.1）：
+Provider 区别（V1.4）：
 - `mock`：永久可用，本地模拟输出（最终 fallback），Model 固定 `mock-brain-v1`
 - `ollama`：本地 Ollama，无需 API Key；服务未启动时会被判定为 unavailable 并 fallback mock
 - `openrouter`：需要 `OPENROUTER_API_KEY`；OpenAI-compatible `chat/completions`
 - `gemini`：需要 `GEMINI_API_KEY`；使用 Google Generative Language API
 - `groq`：需要 `GROQ_API_KEY`；OpenAI-compatible `chat/completions`
 
+配置示例见 `.env.example`。不要提交真实 `.env` 或 API Key。
+
+常用配置：
+
+```powershell
+# Default local mock
+$env:AI_PROVIDER="mock"
+
+# OpenRouter
+$env:AI_PROVIDER="openrouter"
+$env:OPENROUTER_API_KEY="..."
+$env:OPENROUTER_MODEL="openrouter/auto"
+
+# Groq
+$env:AI_PROVIDER="groq"
+$env:GROQ_API_KEY="..."
+$env:GROQ_MODEL="llama-3.1-8b-instant"
+
+# Gemini
+$env:AI_PROVIDER="gemini"
+$env:GEMINI_API_KEY="..."
+$env:GEMINI_MODEL="gemini-1.5-flash"
+
+# Ollama
+$env:AI_PROVIDER="ollama"
+$env:OLLAMA_BASE_URL="http://localhost:11434"
+$env:OLLAMA_MODEL="qwen2.5:7b"
+```
+
 注意：
-- 免费平台额度可能变化，V1.1 不承诺任何外部额度稳定性
+- 免费平台额度可能变化，V1.4 不承诺任何外部额度稳定性
 - 默认仍然是 mock，且所有真实 provider 失败时必须 fallback mock
 
 ## 本地运行方式
@@ -178,6 +220,12 @@ npm run check:console
 node examples/run-console-contract.js
 ```
 
+运行 V1.4 Provider Runtime 示例：
+
+```powershell
+node examples/run-provider-runtime.js
+```
+
 ## 验收标准（V1）
 
 必须成功运行：
@@ -187,6 +235,7 @@ npm install
 npm run build
 npm run demo
 node examples/run-console-contract.js
+node examples/run-provider-runtime.js
 ```
 
 demo 固定输入：
@@ -202,11 +251,11 @@ demo 输出必须包含：
 - 结果正文
 - Review 结果
 - 下一步建议
-- Provider: mock
+- Provider: mock 或配置的免费 provider；不可用时 fallback 到 mock
 - Model: mock-brain-v1
 - Fallback Used
-- Provider Status
-- V1.3 Console contract wrapper: `success/data/error/meta`
+- Provider Status，包含 `mode/name/available/fallbackUsed/reason/error`
+- V1.4 Console contract wrapper: `success/data/error/meta`
 - Console V2 fields: `requestId/taskId/agentRole/provider/result/createdAt`
 
 ## V1 不做什么（明确非目标）
@@ -215,7 +264,7 @@ demo 输出必须包含：
 - 不接 Telegram
 - 不接支付
 - 不放真实 API Key
-- 不接真实 OpenAI / OpenRouter / Gemini / Groq
+- 不接真实 OpenAI 官方付费 Provider（V1.4 仅支持免费优先 provider runtime 配置）
 - 不改服务器
 - 不改 bunnyera-console
 - 不改 bunnyera-console-v2
