@@ -56,7 +56,7 @@ async function main() {
 
   assertProviderRuntime(output);
 
-  console.log('BunnyEra AI V1.5 Free Provider Runtime');
+  console.log('BunnyEra AI V1.6 Free Provider Runtime');
   console.log('');
   console.log('AI_PROVIDER:', process.env.AI_PROVIDER || 'mock');
   console.log('Input Provider:', REQUEST.provider);

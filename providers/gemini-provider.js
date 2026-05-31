@@ -1,4 +1,5 @@
 const { ProviderIds } = require('./types');
+const { createProviderSystemPrompt, createProviderUserPrompt } = require('./prompt-quality');
 
 function normalizeString(value) {
   return String(value || '').trim();
@@ -84,20 +85,14 @@ class GeminiProvider {
     const taskType = normalizeString(params && params.taskType);
     const stage = normalizeString(params && params.stage);
     const context = (params && params.context) || {};
+    const providerStatus = (params && params.providerStatus) || {};
 
     const prompt = [
-      `You are BunnyEra AI Brain V1.1. Role=${agent && agent.role ? agent.role : 'Agent'}.`,
-      'Respond with clear structured text.',
-      '',
-      `TaskType: ${taskType || 'unknown'}`,
-      `Stage: ${stage || 'general'}`,
-      `Input: ${input}`,
-      context && context.plan ? `\nPlan:\n${context.plan}` : '',
-      context && context.result ? `\nResult:\n${context.result}` : '',
-      context && context.review ? `\nReview:\n${context.review}` : ''
+      createProviderSystemPrompt(agent),
+      createProviderUserPrompt({ agent, input, taskType, stage, context, providerStatus })
     ]
       .filter(Boolean)
-      .join('\n');
+      .join('\n\n');
 
     const url = `${this.baseUrl}/v1beta/models/${encodeURIComponent(this.model)}:generateContent?key=${encodeURIComponent(
       this.apiKey

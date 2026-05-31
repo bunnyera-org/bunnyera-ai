@@ -1,4 +1,4 @@
-const { BunnyEraAI } = require('./bunnyera-ai');
+const { BunnyEraAI, CONTRACT_VERSION } = require('./bunnyera-ai');
 
 const DEMO_INPUT = 'Generate a product research report for BunnyEra';
 
@@ -31,7 +31,7 @@ async function main() {
   const agents = ai.loadAgents();
   const output = await ai.runTask(DEMO_INPUT);
 
-  console.log('BunnyEra AI Brain V1.1');
+  console.log(`BunnyEra AI Brain ${CONTRACT_VERSION}`);
   console.log('Local demo (provider router with fallback)');
   console.log('');
   console.log('Input Task:');
@@ -50,5 +50,6 @@ if (require.main === module) {
 }
 
 module.exports = {
-  BunnyEraAI
+  BunnyEraAI,
+  CONTRACT_VERSION
 };

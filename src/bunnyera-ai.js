@@ -3,7 +3,7 @@ const path = require('path');
 const { inferTaskType } = require('../providers/mock-provider');
 const { ProviderRouter } = require('../providers/provider-router');
 
-const CONTRACT_VERSION = 'v1.5.0-provider-selection-support';
+const CONTRACT_VERSION = 'v1.6.0-output-quality-prompt-control';
 const SOURCE = 'bunnyera-ai';
 const CONSOLE_TASK_TYPES = new Set(['strategy', 'planning', 'execution', 'review', 'coding', 'general']);
 
@@ -191,12 +191,14 @@ class BunnyEraAI {
       const coder = this._getAgentById('coder') || { id: 'coder', name: 'Coder', role: 'Coder' };
 
       const session = await this.providerRouter.createSession(providerSelection);
+      const runProviderStatus = session.providerStatus || {};
 
       const planRes = await session.run({
         agent: planner,
         taskType: legacyTaskType,
         input: taskInput,
-        stage: 'plan'
+        stage: 'plan',
+        providerStatus: runProviderStatus
       });
 
       const resultRes = await session.run({
@@ -204,7 +206,8 @@ class BunnyEraAI {
         taskType: legacyTaskType,
         input: taskInput,
         stage: 'execute',
-        context: { plan: planRes.text }
+        context: { plan: planRes.text },
+        providerStatus: runProviderStatus
       });
 
       const reviewRes = await session.run({
@@ -212,7 +215,8 @@ class BunnyEraAI {
         taskType: legacyTaskType,
         input: taskInput,
         stage: 'review',
-        context: { plan: planRes.text, result: resultRes.text }
+        context: { plan: planRes.text, result: resultRes.text },
+        providerStatus: runProviderStatus
       });
 
       const nextRes = await session.run({
@@ -220,7 +224,8 @@ class BunnyEraAI {
         taskType: legacyTaskType,
         input: taskInput,
         stage: 'next',
-        context: { plan: planRes.text, result: resultRes.text, review: reviewRes.text }
+        context: { plan: planRes.text, result: resultRes.text, review: reviewRes.text },
+        providerStatus: runProviderStatus
       });
 
       const agentName = normalizeString(leader.name) || 'Leader';

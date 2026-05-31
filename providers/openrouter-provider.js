@@ -1,4 +1,5 @@
 const { ProviderIds } = require('./types');
+const { createProviderSystemPrompt, createProviderUserPrompt } = require('./prompt-quality');
 
 function normalizeString(value) {
   return String(value || '').trim();
@@ -84,24 +85,16 @@ class OpenRouterProvider {
     const taskType = normalizeString(params && params.taskType);
     const stage = normalizeString(params && params.stage);
     const context = (params && params.context) || {};
+    const providerStatus = (params && params.providerStatus) || {};
 
     const messages = [
       {
         role: 'system',
-        content: `You are BunnyEra AI Brain V1.1. Role=${agent && agent.role ? agent.role : 'Agent'}. Respond with clear structured text.`
+        content: createProviderSystemPrompt(agent)
       },
       {
         role: 'user',
-        content: [
-          `TaskType: ${taskType || 'unknown'}`,
-          `Stage: ${stage || 'general'}`,
-          `Input: ${input}`,
-          context && context.plan ? `Plan:\n${context.plan}` : '',
-          context && context.result ? `Result:\n${context.result}` : '',
-          context && context.review ? `Review:\n${context.review}` : ''
-        ]
-          .filter(Boolean)
-          .join('\n\n')
+        content: createProviderUserPrompt({ agent, input, taskType, stage, context, providerStatus })
       }
     ];
 
